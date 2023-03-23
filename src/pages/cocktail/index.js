@@ -2,7 +2,8 @@ import CocktailCard from "@/components/cocktailcard";
 import Header from "@/components/header/Header";
 import Loader from "@/components/loader";
 import { useGlobalContext } from "@/context/globalContext";
-import { invokeExternalAPI } from "@/utilities/http";
+import { invokeAPI, invokeExternalAPI } from "@/utilities/http";
+import useSWR from "swr";
 import {
   Box,
   Button,
@@ -13,7 +14,8 @@ import {
   Typography,
 } from "@mui/material";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 const Cocktail = ({ cocktails, loading, user }) => {
   const [cocktailData, setCocktailData] = useState(cocktails);
@@ -26,7 +28,7 @@ const Cocktail = ({ cocktails, loading, user }) => {
     textAlign: "start",
     color: theme.palette.text.secondary,
   }));
-
+  // const fetcher = url => axios.get(url).then(res => res.data)
   const handleChange = async (event) => {
     const { data, error } = await invokeExternalAPI(
       "search.php",
@@ -39,7 +41,12 @@ const Cocktail = ({ cocktails, loading, user }) => {
       setCocktailData(data);
     }
     console.log(error);
+
+    console.log(data);
   };
+  // const { data, error,isLoading } = useSWR('https://www.thecocktaildb.com/api/json/v1/1/search.php?', fetcher)
+  // console.log(data);
+  useEffect(() => {}, [search]);
 
   const SearchForm = () => {
     return (
@@ -68,7 +75,6 @@ const Cocktail = ({ cocktails, loading, user }) => {
               onChange={handleChange}
               label="Search Cocktails"
               id="outlined-size-small"
-              defaultValue="s"
               size="small"
             />
           </Box>
@@ -116,17 +122,11 @@ export async function getServerSideProps(ctx) {
     {},
     { s: "s" }
   );
-  // setTimeout(() => {
-
-  // }, 1000);
-
-  loading = false;
 
   return {
     props: {
       cocktails: data,
       error: error,
-      loading: loading,
     },
   };
 }
