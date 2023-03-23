@@ -44,7 +44,7 @@ const ExpandMore = styled((props) => {
 
 const cockTailsDetails = ({ cocktail }) => {
   const [expanded, setExpanded] = React.useState(false);
-  const route = useRouter()
+  const route = useRouter();
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -64,9 +64,9 @@ const cockTailsDetails = ({ cocktail }) => {
     .map((item, index) => ({ value: item.value, id: index + 1 }))
     .filter((item) => item.value !== null);
 
-const backtoHomePage = (params) => {
-  route.push('/cocktail')
-}
+  const backtoHomePage = (params) => {
+    route.push("/cocktail");
+  };
 
   // const newarray = mergeinOneArray(filterArrayIngredient, filterArraymesure)
   // console.log(newarray);
@@ -85,7 +85,7 @@ const backtoHomePage = (params) => {
             }
             action={
               <IconButton onClick={backtoHomePage} aria-label="back">
-               <ArrowBack/>
+                <ArrowBack />
               </IconButton>
             }
             title={cocktail.strDrink}
