@@ -3,55 +3,103 @@ import Header from "@/components/header/Header";
 import Loader from "@/components/loader";
 import { useGlobalContext } from "@/context/globalContext";
 import { invokeExternalAPI } from "@/utilities/http";
-import { Box, Grid, Paper, styled } from "@mui/material";
+import {
+  Box,
+  Button,
+  Grid,
+  Paper,
+  styled,
+  TextField,
+  Typography,
+} from "@mui/material";
 import Link from "next/link";
 import React, { useState } from "react";
 
 const Cocktail = ({ cocktails, loading, user }) => {
-  //  const [loading, setLoading] = useState(true);
-  // const { loading, setloading } = useGlobalContext();
+  const [cocktailData, setCocktailData] = useState(cocktails);
+  const [search, setSearch] = useState(null);
 
-  return (
-    <div>
-      <Header></Header>
-      <h2>List of News</h2>
+  const Item = styled(Paper)(({ theme }) => ({
+    backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
+    ...theme.typography.body2,
+    padding: theme.spacing(0),
+    textAlign: "start",
+    color: theme.palette.text.secondary,
+  }));
+
+  const handleChange = async (event) => {
+    const { data, error } = await invokeExternalAPI(
+      "search.php",
+      "get",
+      {},
+      {},
+      { s: event.target.value }
+    );
+    if (data) {
+      setCocktailData(data);
+    }
+    console.log(error);
+  };
+
+  const SearchForm = () => {
+    return (
       <Box sx={{ flexGrow: 1 }}>
         <Grid
           container
           gap={"15.25px"}
-          p="10px"
+          p="20px"
+          width="100%"
+          justifyContent={"space-between"}
+          m="0"
+          columns={12.5}
+        >
+          <Box
+            display={"flex"}
+            justifyContent="space-between"
+            p="10px 0"
+            gap={"15.25px"}
+            width="100%"
+          >
+            {" "}
+            <Typography gutterBottom variant="h5" component="div">
+              Search Your Favorite Cocktail
+            </Typography>
+            <TextField
+              onChange={handleChange}
+              label="Search Cocktails"
+              id="outlined-size-small"
+              defaultValue="s"
+              size="small"
+            />
+          </Box>
+        </Grid>
+      </Box>
+    );
+  };
+
+  return (
+    <div>
+      <Header></Header>
+
+      <SearchForm></SearchForm>
+      <Box sx={{ flexGrow: 1 }}>
+        <Grid
+          container
+          gap={"15.25px"}
+          p="20px"
           width="100%"
           m="0"
           columns={12.5}
         >
-          {cocktails.drinks.slice(0,20).map((drink) => (
-            <CocktailCard item={drink} key={drink.idDrink} />
+          {cocktailData.drinks.slice(0, 20).map((drink) => (
+            <Grid key={drink.idDrink} xs={3}>
+              <Item>
+                <CocktailCard item={drink} />
+              </Item>
+            </Grid>
           ))}
         </Grid>
       </Box>
-      {/* <Box sx={{ flexGrow: 1 }}>
-      <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
-        {Array.from(Array(6)).map((_, index) => (
-          <Grid xs={2} sm={4} md={4} key={index}>
-            <Item>xs=2</Item>
-          </Grid>
-        ))}
-      </Grid>
-    </Box> */}
-      {/* <div>
-        <ul>
-          {cocktails.drinks.map((item, index) => (
-            <li style={{ padding: "5px" }} key={item.idDrink}>
-              <span>
-                {item.idDrink} -{item.strDrink} -{" "}
-                <Link href={`/cocktail/${item.idDrink}`}>{item.strDrink}</Link>
-              </span>
-
-              <hr />
-            </li>
-          ))}
-        </ul>
-      </div> */}
     </div>
   );
 };
@@ -59,7 +107,6 @@ const Cocktail = ({ cocktails, loading, user }) => {
 export default Cocktail;
 
 export async function getServerSideProps(ctx) {
-  // const {loading, setloading,}= useGlobalContext()
   let loading = true;
 
   const { data, error } = await invokeExternalAPI(
