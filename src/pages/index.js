@@ -3,7 +3,6 @@
 
 // let homepath = '/home';
 
-
 // console.log(publicRuntimeConfig);
 // if (publicRuntimeConfig.ENV !== 'local') {
 //   homepath = `${publicRuntimeConfig.EXTRA_PATH}${homepath}`;
@@ -18,15 +17,36 @@
 
 // export default Index;
 
-import Link from 'next/link'
-import React from 'react'
+import SearchForm from "@/components/childs/Searchform";
+import Layout from "@/layout";
+import { Box, Grid, Stack, Typography } from "@mui/material";
+import Link from "next/link";
+import React from "react";
 
 const index = () => {
   return (
-    <div>
-      <Link href={'/cocktail'} >Cocktail</Link>
-    </div>
-  )
-}
+    <Layout>
+      <Box width={"100%"}>
+        <Stack
+          justifyContent={"space-between"}
+          overflow="hidden"
+          width={"100%"}
+        >
+          <SearchForm />
+        </Stack>
+        <Stack  
+          overflow="hidden"
+        
+          width={"100%"}>
+          <Grid container spacing={3} columns={12.5}>
+            <Grid item xs={4}>
+              asdasd
+            </Grid>
+          </Grid>
+        </Stack>
+      </Box>
+    </Layout>
+  );
+};
 
-export default index
+export default index;
