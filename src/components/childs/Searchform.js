@@ -1,3 +1,4 @@
+import { invokeExternalAPI } from "@/utilities/http";
 import { Search } from "@mui/icons-material";
 import {
   Box,
@@ -9,12 +10,21 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 
 const SearchForm = () => {
+  const [val, setval] = useState();
   const HandleChange = (second) => {
     console.log(second);
   };
+
+  const handleSearch = async(second) => { 
+    console.log(val);
+    const res = await invokeExternalAPI("search.php", "get", {}, {}, { s: val });
+    console.log(res);
+  
+   }
+  
 
   return (
     <Box
@@ -24,20 +34,22 @@ const SearchForm = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        py:5,
-        flexDirection:'column',
+        py: 5,
+        flexDirection: "column",
         m: "0px !important",
-        gap:2,
+        gap: 2,
         border: "none",
       }}
     >
-    <Typography>Search Your Favorite Cocktail</Typography>
+      <Typography>Search Your Favorite Cocktail</Typography>
       <FormControl sx={{ m: 0, width: "35%" }} variant="outlined">
         <OutlinedInput
           id="outlined-adornment-search"
           size="small"
           placeholder="Searching for...."
           color="error"
+          // @ts-ignore
+          onChange={(e)=>setval(e.target.value)}
           sx={{
             borderRadius: "1200px",
             p: 0,
@@ -50,6 +62,7 @@ const SearchForm = () => {
               color="inherit"
               aria-label="more"
               id="long-button"
+              onClick={handleSearch}
               aria-haspopup="true"
               disableElevation
               endIcon={<Search />}
@@ -62,7 +75,7 @@ const SearchForm = () => {
                 textTransform: "capitalize",
                 background: "#F6F9FC",
                 borderRadius: "0 0 0 0",
-                margin:0,
+                margin: 0,
                 alignItems: "center",
                 borderLeft: "1px solid #DAE1E7",
               }}
