@@ -3,7 +3,6 @@
 
 // let homepath = '/home';
 
-
 // console.log(publicRuntimeConfig);
 // if (publicRuntimeConfig.ENV !== 'local') {
 //   homepath = `${publicRuntimeConfig.EXTRA_PATH}${homepath}`;
@@ -18,15 +17,55 @@
 
 // export default Index;
 
-import Link from 'next/link'
-import React from 'react'
+import SearchForm from "@/components/childs/Searchform";
+import CocktailCard from "@/components/cocktailcard";
+import Layout from "@/layout";
+import { fetcher, useGetFetcher } from "@/lib/helper";
+import { invokeExternalAPI } from "@/utilities/http";
+import { Box, Grid, Stack, Typography } from "@mui/material";
+import Link from "next/link";
+import React, { useState } from "react";
 
-const index = () => {
+const Index = ({ cocktails }) => {
+
+  const params ={
+    s:'new'
+  }
+  const newData = useGetFetcher('search.php',params)
+  console.log(newData);
   return (
-    <div>
-      <Link href={'/cocktail'} >Cocktail</Link>
-    </div>
-  )
-}
+    <Layout>
+      <Box width={"100%"}>
+        <Stack
+          justifyContent={"space-between"}
+          overflow="hidden"
+          width={"100%"}
+        >
+          <SearchForm />
+        </Stack>
+        <Stack overflow="hidden" width={"100%"}>
+          <Grid container spacing={2} columns={12.5}>
+            {cocktails?.data?.drinks?.map((item) => (
+              <Grid key={item.id} item xs={3}>
+                <CocktailCard item={item}></CocktailCard>
+              </Grid>
+            ))}
+          </Grid>
+        </Stack>
+      </Box>
+    </Layout>
+  );
+};
 
-export default index
+export default Index;
+
+export async function getServerSideProps(ctx) {
+  const res = await invokeExternalAPI("search.php", "get", {}, {}, { s: "s" });
+ 
+
+  return {
+    props: {
+      cocktails: res,
+    },
+  };
+}

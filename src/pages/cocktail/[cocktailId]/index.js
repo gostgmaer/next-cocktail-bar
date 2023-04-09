@@ -1,6 +1,8 @@
+//react-hooks/rules-of-hooks
 import Header from "@/components/header/Header";
+import getCocktail from "@/lib/helper";
 import { mergeinOneArray } from "@/utilities/functions";
-import { invokeExternalAPI } from "@/utilities/http";
+import { invokeAPI, invokeExternalAPI } from "@/utilities/http";
 import styled from "@emotion/styled";
 import {
   ArrowBack,
@@ -29,7 +31,7 @@ import {
 } from "@mui/material";
 import { red } from "@mui/material/colors";
 import { useRouter } from "next/router";
-import React, { Fragment } from "react";
+import React, { Fragment, useState } from "react";
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -42,19 +44,23 @@ const ExpandMore = styled((props) => {
   // }),
 }));
 
-const cockTailsDetails = ({ cocktail }) => {
-  const [expanded, setExpanded] = React.useState(false);
+const CockTailsDetails = ({ data }) => {
+  const [expanded, setExpanded] = useState(false);
   const route = useRouter();
+  //   console.log(route);
+  // console.log(data);
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
-  const output = Object.entries(cocktail).map(([key, value]) => ({
-    key,
-    value,
-  }));
 
-  const filterArrayIngredient = output
+  let newarray;
+  if (data) {
+  const  output = Object.entries(data).map(([key, value]) => ({
+      key,
+      value,
+    }));
+    const filterArrayIngredient = output
     .filter((item) => item.key.match("strIngredient"))
     .map((item, index) => ({ Ingredient: item.value, id: index + 1 }))
     .filter((item) => item.Ingredient !== null);
@@ -64,12 +70,23 @@ const cockTailsDetails = ({ cocktail }) => {
     .map((item, index) => ({ value: item.value, id: index + 1 }))
     .filter((item) => item.value !== null);
 
+   newarray = mergeinOneArray(filterArrayIngredient, filterArraymesure)
+  }
+  // const output = Object.entries(data).map(([key, value]) => ({
+  //   key,
+  //   value,
+  // }));
+
+
+
+
   const backtoHomePage = (params) => {
-    route.push("/cocktail");
+    route.push("/");
   };
 
-  // const newarray = mergeinOneArray(filterArrayIngredient, filterArraymesure)
-  // console.log(newarray);
+  if (route.isFallback) {
+    return <p>Loading...</p>;
+  }
 
   return (
     <div>
@@ -80,7 +97,7 @@ const cockTailsDetails = ({ cocktail }) => {
           <CardHeader
             avatar={
               <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
-                {cocktail.strDrink.substring(0, 1)}
+                {data.strDrink.substring(0, 1)}
               </Avatar>
             }
             action={
@@ -88,18 +105,18 @@ const cockTailsDetails = ({ cocktail }) => {
                 <ArrowBack />
               </IconButton>
             }
-            title={cocktail.strDrink}
-            subheader={cocktail.strGlass}
+            title={data.strDrink}
+            subheader={data.strGlass}
           />
           <CardMedia
             component="img"
             height="194"
-            image={cocktail.strDrinkThumb}
+            image={data.strDrinkThumb}
             alt="Paella dish"
           />
           <CardContent>
             <Typography variant="body2" color="text.secondary">
-              {cocktail.strInstructions}
+              {data.strInstructions}
             </Typography>
           </CardContent>
           <CardActions disableSpacing>
@@ -120,8 +137,8 @@ const cockTailsDetails = ({ cocktail }) => {
           </CardActions>
           <Collapse in={expanded} timeout="auto" unmountOnExit>
             <CardContent>
-              {cocktail.strTags && (
-                <Typography paragraph>Tag: {cocktail.strTags}</Typography>
+              {data.strTags && (
+                <Typography paragraph>Tag: {data.strTags}</Typography>
               )}
               <Typography
                 sx={{
@@ -130,8 +147,8 @@ const cockTailsDetails = ({ cocktail }) => {
                   flexDirection: "column",
                 }}
               >
-                <span> is Alocholic: {cocktail.Alcoholic ? "Yes" : "No"}</span>
-                <span>Category: {cocktail.strCategory}</span>
+                <span> is Alocholic: {data.Alcoholic ? "Yes" : "No"}</span>
+                <span>Category: {data.strCategory}</span>
               </Typography>
               <Typography variant="h5">Ingredients:</Typography>
               <List
@@ -141,7 +158,7 @@ const cockTailsDetails = ({ cocktail }) => {
                   bgcolor: "background.paper",
                 }}
               >
-                {mergeinOneArray(filterArrayIngredient, filterArraymesure).map(
+                {newarray?.map(
                   (dataItem) => (
                     <Fragment key={dataItem.id}>
                       <ListItem alignItems="flex-start">
@@ -168,23 +185,26 @@ const cockTailsDetails = ({ cocktail }) => {
   );
 };
 
-export default cockTailsDetails;
+export default CockTailsDetails;
 
-export async function getServerSideProps(ctx) {
-  const { params } = ctx;
-
-  const { data, error } = await invokeExternalAPI(
-    "lookup.php",
-    "get",
-    {},
-    {},
-    { i: params.cocktailId }
-  );
-
+export async function getStaticProps(context) {
+  const { params } = context;
+  const res = await invokeAPI("lookup.php?i=11007", "get", {}, {}, {});
+  // console.log(res);
+  // if (!res.idDrink) {
+  //   return {
+  //     notFound: true,
+  //   };
+  // }
   return {
-    props: {
-      cocktail: data.drinks[0],
-      error: error,
-    },
+    props: { data: res.drinks[0] },
+  };
+}
+
+export async function getStaticPaths(ctx) {
+  console.log("ctx", ctx);
+  return {
+    paths: [{ params: { cocktailId: "14195" } }],
+    fallback: true,
   };
 }
