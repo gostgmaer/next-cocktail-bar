@@ -11,6 +11,7 @@ import {
   styled,
   Typography,
 } from "@mui/material";
+import Link from "next/link";
 import { useRouter } from "next/router";
 
 const CocktailCard = ({ item }) => {
@@ -25,8 +26,8 @@ const CocktailCard = ({ item }) => {
         <CardMedia
           component="img"
           height="140"
-          image={item.strDrinkThumb}
-          alt={item.strDrink}
+          image={item?.strDrinkThumb}
+          alt={item?.strDrink}
         />
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">
@@ -41,14 +42,7 @@ const CocktailCard = ({ item }) => {
         </CardContent>
       </CardActionArea>
       <CardActions>
-        <Button
-          onClick={() => sendtoDetails(item.idDrink)}
-          size="small"
-          color="primary"
-          variant="outlined"
-        >
-          Get Details
-        </Button>
+        <Link href={`/cocktail/${item.idDrink}`}>Get Details</Link>
       </CardActions>
     </Card>
   );

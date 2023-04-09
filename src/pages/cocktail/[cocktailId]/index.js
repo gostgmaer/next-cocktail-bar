@@ -1,6 +1,7 @@
 import Header from "@/components/header/Header";
+import getCocktail from "@/lib/helper";
 import { mergeinOneArray } from "@/utilities/functions";
-import { invokeExternalAPI } from "@/utilities/http";
+import { invokeAPI, invokeExternalAPI } from "@/utilities/http";
 import styled from "@emotion/styled";
 import {
   ArrowBack,
@@ -42,14 +43,17 @@ const ExpandMore = styled((props) => {
   // }),
 }));
 
-const cockTailsDetails = ({ cocktail }) => {
+const cockTailsDetails = ({ data }) => {
   const [expanded, setExpanded] = React.useState(false);
   const route = useRouter();
+  console.log(route);
+console.log(data);
+
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
-  const output = Object.entries(cocktail).map(([key, value]) => ({
+  const output = Object.entries(data).map(([key, value]) => ({
     key,
     value,
   }));
@@ -65,11 +69,15 @@ const cockTailsDetails = ({ cocktail }) => {
     .filter((item) => item.value !== null);
 
   const backtoHomePage = (params) => {
-    route.push("/cocktail");
+    route.push("/");
   };
 
   // const newarray = mergeinOneArray(filterArrayIngredient, filterArraymesure)
   // console.log(newarray);
+
+  if (route.isFallback) {
+    return <p>Loading...</p>;
+  }
 
   return (
     <div>
@@ -80,7 +88,7 @@ const cockTailsDetails = ({ cocktail }) => {
           <CardHeader
             avatar={
               <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
-                {cocktail.strDrink.substring(0, 1)}
+                {data.strDrink.substring(0, 1)}
               </Avatar>
             }
             action={
@@ -88,18 +96,18 @@ const cockTailsDetails = ({ cocktail }) => {
                 <ArrowBack />
               </IconButton>
             }
-            title={cocktail.strDrink}
-            subheader={cocktail.strGlass}
+            title={data.strDrink}
+            subheader={data.strGlass}
           />
           <CardMedia
             component="img"
             height="194"
-            image={cocktail.strDrinkThumb}
+            image={data.strDrinkThumb}
             alt="Paella dish"
           />
           <CardContent>
             <Typography variant="body2" color="text.secondary">
-              {cocktail.strInstructions}
+              {data.strInstructions}
             </Typography>
           </CardContent>
           <CardActions disableSpacing>
@@ -120,8 +128,8 @@ const cockTailsDetails = ({ cocktail }) => {
           </CardActions>
           <Collapse in={expanded} timeout="auto" unmountOnExit>
             <CardContent>
-              {cocktail.strTags && (
-                <Typography paragraph>Tag: {cocktail.strTags}</Typography>
+              {data.strTags && (
+                <Typography paragraph>Tag: {data.strTags}</Typography>
               )}
               <Typography
                 sx={{
@@ -130,11 +138,11 @@ const cockTailsDetails = ({ cocktail }) => {
                   flexDirection: "column",
                 }}
               >
-                <span> is Alocholic: {cocktail.Alcoholic ? "Yes" : "No"}</span>
-                <span>Category: {cocktail.strCategory}</span>
+                <span> is Alocholic: {data.Alcoholic ? "Yes" : "No"}</span>
+                <span>Category: {data.strCategory}</span>
               </Typography>
-              <Typography variant="h5">Ingredients:</Typography>
-              <List
+              <Typography variant="h5">Ingredients:</Typography> 
+               <List
                 sx={{
                   width: "100%",
                   maxWidth: 360,
@@ -159,8 +167,8 @@ const cockTailsDetails = ({ cocktail }) => {
                     </Fragment>
                   )
                 )}
-              </List>
-            </CardContent>
+              </List> 
+             </CardContent>
           </Collapse>
         </Card>
       </Box>
@@ -170,21 +178,29 @@ const cockTailsDetails = ({ cocktail }) => {
 
 export default cockTailsDetails;
 
-export async function getServerSideProps(ctx) {
-  const { params } = ctx;
-
-  const { data, error } = await invokeExternalAPI(
-    "lookup.php",
+export async function getStaticProps(context) {
+  const { params } = context;
+  const res = await invokeAPI(
+    "lookup.php?i=11007",
     "get",
     {},
     {},
-    { i: params.cocktailId }
+    {}
   );
-
+  console.log(res);
+  // if (!res.idDrink) {
+  //   return {
+  //     notFound: true,
+  //   };
+  // }
   return {
-    props: {
-      cocktail: data.drinks[0],
-      error: error,
-    },
+    props: { data: res.drinks[0] },
+  };
+}
+
+export async function getStaticPaths() {
+  return {
+    paths: [{ params: { cocktailId: "14195" } }],
+    fallback: true,
   };
 }

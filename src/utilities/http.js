@@ -22,7 +22,7 @@ export const invokeExternalAPI = async (
   if (method === "get") {
     delete options.body;
   }
-
+  console.log(options);
   let data = null;
   let error = null;
 
@@ -52,9 +52,10 @@ export const invokeAPI = async (
   const options = {
     method: method,
     url: baseURL + endpoint,
+    data: body,
     headers: header,
     params: query,
-    data: body,
+   
   };
 
   cleanQueryparam(options.params);
@@ -65,7 +66,7 @@ export const invokeAPI = async (
 
   let data = null;
   let error = null;
-
+console.log(options);
   try {
     const res = await axios(options);
     data = res.data;
