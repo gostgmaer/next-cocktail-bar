@@ -1,21 +1,4 @@
-// import getConfig from 'next/config';
-// const { publicRuntimeConfig } = getConfig();
 
-// let homepath = '/home';
-
-// console.log(publicRuntimeConfig);
-// if (publicRuntimeConfig.ENV !== 'local') {
-//   homepath = `${publicRuntimeConfig.EXTRA_PATH}${homepath}`;
-// }
-
-// const Index = () => {};
-// Index.getInitialProps = async ctx => {
-//  // console.log(ctx.res);
-//   ctx.res.writeHead(302, { Location: homepath });
-//   ctx.res.end();
-// };
-
-// export default Index;
 
 import SearchForm from "@/components/childs/Searchform";
 import CocktailCard from "@/components/cocktailcard";
@@ -27,13 +10,8 @@ import Link from "next/link";
 import React, { useState } from "react";
 
 const index = ({ cocktails }) => {
-  const [CockTail, setCockTail] = useState(cocktails);
-  const [val, setVal] = useState(null);
-  const params ={
-    s:'new'
-  }
-  const newData = useGetFetcher('search.php',params)
-  console.log(newData);
+  
+ 
   return (
     <Layout>
       <Box width={"100%"}>

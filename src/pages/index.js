@@ -26,9 +26,8 @@ import { Box, Grid, Stack, Typography } from "@mui/material";
 import Link from "next/link";
 import React, { useState } from "react";
 
-const index = ({ cocktails }) => {
-  const [CockTail, setCockTail] = useState(cocktails);
-  const [val, setVal] = useState(null);
+const Index = ({ cocktails }) => {
+
   const params ={
     s:'new'
   }
@@ -58,7 +57,7 @@ const index = ({ cocktails }) => {
   );
 };
 
-export default index;
+export default Index;
 
 export async function getServerSideProps(ctx) {
   const res = await invokeExternalAPI("search.php", "get", {}, {}, { s: "s" });

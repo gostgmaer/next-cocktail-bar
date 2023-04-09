@@ -1,3 +1,4 @@
+//react-hooks/rules-of-hooks
 import Header from "@/components/header/Header";
 import getCocktail from "@/lib/helper";
 import { mergeinOneArray } from "@/utilities/functions";
@@ -30,7 +31,7 @@ import {
 } from "@mui/material";
 import { red } from "@mui/material/colors";
 import { useRouter } from "next/router";
-import React, { Fragment } from "react";
+import React, { Fragment, useState } from "react";
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -43,22 +44,23 @@ const ExpandMore = styled((props) => {
   // }),
 }));
 
-const cockTailsDetails = ({ data }) => {
-  const [expanded, setExpanded] = React.useState(false);
+const CockTailsDetails = ({ data }) => {
+  const [expanded, setExpanded] = useState(false);
   const route = useRouter();
-  console.log(route);
-console.log(data);
-
+  //   console.log(route);
+  // console.log(data);
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
-  const output = Object.entries(data).map(([key, value]) => ({
-    key,
-    value,
-  }));
 
-  const filterArrayIngredient = output
+  let newarray;
+  if (data) {
+  const  output = Object.entries(data).map(([key, value]) => ({
+      key,
+      value,
+    }));
+    const filterArrayIngredient = output
     .filter((item) => item.key.match("strIngredient"))
     .map((item, index) => ({ Ingredient: item.value, id: index + 1 }))
     .filter((item) => item.Ingredient !== null);
@@ -68,12 +70,19 @@ console.log(data);
     .map((item, index) => ({ value: item.value, id: index + 1 }))
     .filter((item) => item.value !== null);
 
+   newarray = mergeinOneArray(filterArrayIngredient, filterArraymesure)
+  }
+  // const output = Object.entries(data).map(([key, value]) => ({
+  //   key,
+  //   value,
+  // }));
+
+
+
+
   const backtoHomePage = (params) => {
     route.push("/");
   };
-
-  // const newarray = mergeinOneArray(filterArrayIngredient, filterArraymesure)
-  // console.log(newarray);
 
   if (route.isFallback) {
     return <p>Loading...</p>;
@@ -141,15 +150,15 @@ console.log(data);
                 <span> is Alocholic: {data.Alcoholic ? "Yes" : "No"}</span>
                 <span>Category: {data.strCategory}</span>
               </Typography>
-              <Typography variant="h5">Ingredients:</Typography> 
-               <List
+              <Typography variant="h5">Ingredients:</Typography>
+              <List
                 sx={{
                   width: "100%",
                   maxWidth: 360,
                   bgcolor: "background.paper",
                 }}
               >
-                {mergeinOneArray(filterArrayIngredient, filterArraymesure).map(
+                {newarray?.map(
                   (dataItem) => (
                     <Fragment key={dataItem.id}>
                       <ListItem alignItems="flex-start">
@@ -167,8 +176,8 @@ console.log(data);
                     </Fragment>
                   )
                 )}
-              </List> 
-             </CardContent>
+              </List>
+            </CardContent>
           </Collapse>
         </Card>
       </Box>
@@ -176,18 +185,12 @@ console.log(data);
   );
 };
 
-export default cockTailsDetails;
+export default CockTailsDetails;
 
 export async function getStaticProps(context) {
   const { params } = context;
-  const res = await invokeAPI(
-    "lookup.php?i=11007",
-    "get",
-    {},
-    {},
-    {}
-  );
-  console.log(res);
+  const res = await invokeAPI("lookup.php?i=11007", "get", {}, {}, {});
+  // console.log(res);
   // if (!res.idDrink) {
   //   return {
   //     notFound: true,
@@ -198,7 +201,8 @@ export async function getStaticProps(context) {
   };
 }
 
-export async function getStaticPaths() {
+export async function getStaticPaths(ctx) {
+  console.log("ctx", ctx);
   return {
     paths: [{ params: { cocktailId: "14195" } }],
     fallback: true,
