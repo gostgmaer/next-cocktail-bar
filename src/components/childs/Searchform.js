@@ -1,4 +1,7 @@
-import { invokeExternalAPI } from "@/utilities/http";
+import { fetcher, useFetcher, useGetFetcher } from "@/lib/helper";
+import { invokeAPI, invokeExternalAPI } from "@/utilities/http";
+import { baseURL } from "@/utilities/settings";
+import useSWR from "swr";
 import { Search } from "@mui/icons-material";
 import {
   Box,
@@ -10,7 +13,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const SearchForm = () => {
   const [val, setval] = useState();
@@ -18,14 +21,19 @@ const SearchForm = () => {
     console.log(second);
   };
 
-  const handleSearch = async(second) => { 
-    console.log(val);
-    const res = await invokeExternalAPI("search.php", "get", {}, {}, { s: val });
-    console.log(res);
-  
-   }
-  
+  // const handleSearch = async (second) => {
+  //   console.log(val);
+  //   const res = await invokeAPI("search.php", "get", {}, {}, { s: val });
+  //   console.log(res);
+  // };
 
+  // useEffect(() => {
+  //   handleSearch();
+  // }, [val]);
+
+  const { data, mutate } = useSWR(`${baseURL}${"search.php"}`, fetcher);
+
+  console.log(mutate);
   return (
     <Box
       sx={{
@@ -49,7 +57,7 @@ const SearchForm = () => {
           placeholder="Searching for...."
           color="error"
           // @ts-ignore
-          onChange={(e)=>setval(e.target.value)}
+          onChange={(e) => setval(e.target.value)}
           sx={{
             borderRadius: "1200px",
             p: 0,
@@ -62,7 +70,7 @@ const SearchForm = () => {
               color="inherit"
               aria-label="more"
               id="long-button"
-              onClick={handleSearch}
+              // onClick={handleSearch}
               aria-haspopup="true"
               disableElevation
               endIcon={<Search />}
