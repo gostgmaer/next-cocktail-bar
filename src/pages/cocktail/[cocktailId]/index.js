@@ -6,11 +6,8 @@ import { invokeAPI, invokeExternalAPI } from "@/utilities/http";
 import styled from "@emotion/styled";
 import {
   ArrowBack,
-  ConstructionOutlined,
-  Expand,
   ExpandMoreOutlined,
   Favorite,
-  MoreVert,
   Share,
 } from "@mui/icons-material";
 import {
@@ -32,7 +29,7 @@ import {
 import { red } from "@mui/material/colors";
 import { useRouter } from "next/router";
 import React, { Fragment, useState } from "react";
-
+// import styles from '../../../styles/Contract.module.scss';
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
   return <IconButton {...other} />;
@@ -56,29 +53,26 @@ const CockTailsDetails = ({ data }) => {
 
   let newarray;
   if (data) {
-  const  output = Object.entries(data).map(([key, value]) => ({
+    const output = Object.entries(data).map(([key, value]) => ({
       key,
       value,
     }));
     const filterArrayIngredient = output
-    .filter((item) => item.key.match("strIngredient"))
-    .map((item, index) => ({ Ingredient: item.value, id: index + 1 }))
-    .filter((item) => item.Ingredient !== null);
+      .filter((item) => item.key.match("strIngredient"))
+      .map((item, index) => ({ Ingredient: item.value, id: index + 1 }))
+      .filter((item) => item.Ingredient !== null);
 
-  const filterArraymesure = output
-    .filter((item) => item.key.match("strMeasure"))
-    .map((item, index) => ({ value: item.value, id: index + 1 }))
-    .filter((item) => item.value !== null);
+    const filterArraymesure = output
+      .filter((item) => item.key.match("strMeasure"))
+      .map((item, index) => ({ value: item.value, id: index + 1 }))
+      .filter((item) => item.value !== null);
 
-   newarray = mergeinOneArray(filterArrayIngredient, filterArraymesure)
+    newarray = mergeinOneArray(filterArrayIngredient, filterArraymesure);
   }
   // const output = Object.entries(data).map(([key, value]) => ({
   //   key,
   //   value,
   // }));
-
-
-
 
   const backtoHomePage = (params) => {
     route.push("/");
@@ -140,16 +134,14 @@ const CockTailsDetails = ({ data }) => {
               {data.strTags && (
                 <Typography paragraph>Tag: {data.strTags}</Typography>
               )}
-              <Typography
-                sx={{
-                  display: "flex",
-                  alignItems: "flex-start",
-                  flexDirection: "column",
-                }}
-              >
-                <span> is Alocholic: {data.Alcoholic ? "Yes" : "No"}</span>
-                <span>Category: {data.strCategory}</span>
-              </Typography>
+              <List>
+                <ListItemText
+                  primary={` is Alocholic: ${data.Alcoholic ? "Yes" : "No"}`}
+                />
+
+                <ListItemText primary={`Category: ${data.strCategory}`} />
+              </List>
+
               <Typography variant="h5">Ingredients:</Typography>
               <List
                 sx={{
@@ -158,24 +150,22 @@ const CockTailsDetails = ({ data }) => {
                   bgcolor: "background.paper",
                 }}
               >
-                {newarray?.map(
-                  (dataItem) => (
-                    <Fragment key={dataItem.id}>
-                      <ListItem alignItems="flex-start">
-                        <ListItemText
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                          }}
-                          primary={`${dataItem.Ingredient} : `}
-                          secondary={dataItem.value}
-                        />
-                      </ListItem>
-                      <Divider variant="inset" component="li" />
-                    </Fragment>
-                  )
-                )}
+                {newarray?.map((dataItem) => (
+                  <Fragment key={dataItem.id}>
+                    <ListItem alignItems="flex-start">
+                      <ListItemText
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                        }}
+                        primary={`${dataItem.Ingredient} : `}
+                        secondary={dataItem.value}
+                      />
+                    </ListItem>
+                    <Divider variant="inset" component="li" />
+                  </Fragment>
+                ))}
               </List>
             </CardContent>
           </Collapse>
@@ -189,20 +179,21 @@ export default CockTailsDetails;
 
 export async function getStaticProps(context) {
   const { params } = context;
-  const res = await invokeAPI("lookup.php?i=11007", "get", {}, {}, {});
-  // console.log(res);
-  // if (!res.idDrink) {
-  //   return {
-  //     notFound: true,
-  //   };
-  // }
+
+  const res = await invokeAPI(
+    "lookup.php?",
+    "get",
+    {},
+    {},
+    { i: params.cocktailId }
+  );
+
   return {
     props: { data: res.drinks[0] },
   };
 }
 
 export async function getStaticPaths(ctx) {
-  console.log("ctx", ctx);
   return {
     paths: [{ params: { cocktailId: "14195" } }],
     fallback: true,

@@ -7,8 +7,8 @@ import useSWR from "swr";
 export const fetcher = (...args) => axios(...args).then((res) => res.data);
 
 export function useFetcher(endpoint) {
-  const { data, error, isLoading } = useSWR(
-    `${baseURL}${endpoint}?populate=*`,
+  const { data, error, isLoading, mutate } = useSWR(
+    `${baseURL}${endpoint}`,
     fetcher
   );
 
@@ -34,8 +34,16 @@ export function useGetFetcher(endpoint, fetcherData) {
 
 export default async function getCocktail(id) {
   const newId = {
-    i:id
-  }
+    i: id,
+  };
   const res = await invokeAPI("search.php", "get", {}, {}, newId);
   return res;
 }
+
+// export async function searchCocktail(p){
+//   const newId = {
+//     s:p
+//   }
+//   const res = await invokeAPI("search.php", "get", {}, {}, newId);
+//   return res;
+// }

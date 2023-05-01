@@ -10,7 +10,14 @@ const Layout = ({ children }) => {
       <Box
         className="elements"
         minHeight={"100vh"}
-        sx={{ width: "100%",p:5, display: "flex", flexDirection: "column", gap: 0 }}
+        sx={{
+          width: "100%",
+          p: 5,
+          
+          display: "flex",
+          flexDirection: "column",
+          gap: 0,
+        }}
       >
         {children}
       </Box>
